@@ -22,6 +22,12 @@ class Music {
         return musicID;
     }
 
+    static isMusic(musicID){
+        if(musicID < 0) return false;
+        let musicList = getMusicListFromFile(FILE_PATH);
+        return musicID < musicList.length;
+    }
+
     static getMusicFromList(musicID){
         let musicList = getMusicListFromFile(FILE_PATH);
         if(musicID < 0 || musicID > musicList.length){
