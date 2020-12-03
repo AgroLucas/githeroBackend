@@ -1,6 +1,8 @@
 var express = require("express");
 var router = express.Router();
 var Beatmap = require("../model/Beatmap.js");
+let { authorize } = require("../utils/auth");
+
 
 // GET beatmap LIST
 router.get("/", function(req, res, next) {
@@ -18,8 +20,8 @@ router.get("/:beatmapID", function(req, res, next) {
     
 });
 
-//POST a new beatmap
-router.post("/", function(req, res, next){
+//POST a new beatmap -> return beatmapID
+router.post("/", authorize, function(req, res, next){
     let beatmap = new Beatmap(req.params.noteList, req.params.difficulty, req.params.musicTitle, 
         req.params.musicData, req.params.songArtist, req.params.bmCreator, req.params.leaderboard);
     let beatmapID = beatmap.save();
