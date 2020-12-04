@@ -24,7 +24,6 @@ router.get("/:beatmapID", function(req, res, next) {
 router.post("/", /*authorize,*/ function(req, res, next){
     let beatmap = new Beatmap(req.body.noteList, req.body.difficulty, req.body.musicTitle, 
         req.body.musicData, req.body.musicArtist, req.body.bmCreator, req.body.leaderboard);
-    console.log("before save");
     let beatmapID = beatmap.save();
     return res.json({beatmapID: beatmapID});
 });

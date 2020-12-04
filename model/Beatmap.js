@@ -58,9 +58,9 @@ class Beatmap {
             creator: bm.creator,
             leaderboard: bm.leaderboard,
             musicID: music.musicID,
-            musicTitle: music.musicTitle,
-            musicArtist: music.musicArtist,
-            musicData: music.musicData,
+            musicTitle: music.title,
+            musicArtist: music.artist,
+            musicData: music.data,
         }
         return res;
     }
