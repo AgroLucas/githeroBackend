@@ -7,6 +7,7 @@ var logger = require("morgan");
 var usersRouter = require("./routes/users");
 var beatmapRouter = require("./routes/beatmaps");
 
+let { authorize } = require("./utils/auth");
 var app = express();
 
 app.use(logger("dev"));
