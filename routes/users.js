@@ -3,7 +3,7 @@ let router = express.Router();
 
 const JWT = require("jsonwebtoken");
 const { response } = require("../app.js");
-const {JWTSECRET , JWTLIFETIME , authorize} = require ("../auth.js");
+const {JWTSECRET , JWTLIFETIME , authorize} = require ("../utils/auth.js");
 let User = require("../model/User.js");
 /* GET user list : secure the route with JWT authorization */
 router.get("/", authorize, function (req, res, next) {
