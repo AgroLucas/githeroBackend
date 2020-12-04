@@ -13,32 +13,50 @@ class User {
 
   /* return a promise with async / await */ 
   async save() {
-    let userList = getUserListFromFile(FILE_PATH);
-    const hashedPassword = await bcrypt.hash(this.password, saltRounds);
-    console.log("save:", this.email);
-    userList.push({
-      username: this.email,
-      email: this.email,
-      password: hashedPassword,
-    });
-    saveUserListToFile(FILE_PATH, userList);
-    return true;
-  }
+    console.log('Promise save pending');
+    let userList = getUserListFromFile(USER_FILE);
+    try{
+      console.log('Promise BCRYPT.hash pending');
+      let hashedPassword = await bcrypt.hash(this.password, SALTROUNDS); //async attendre return de hash
+      console.log('Promise BCRYPT.hash fulfilled, hashedPassword :', hashedPassword);
+      userList.push({username: this.email, email: this.email, password: hashedPassword});
+      saveUserListToFile(USER_FILE,userList);
+      console.log('Promise save fulfilled');
+      return Promise.resolve(true);
+    }catch(error){
+      console.log('Promise save rejected :', error);
+      return Promise.reject('Promise save rejected : error in BCRYPT.hash or saveUserListToFile');
+    };
+
+    }
+  
 
   /* return a promise with classic promise syntax*/
-  checkCredentials(email, password) {
-    if (!email || !password) return false;
+  async checkCredentials(email, password) {
+   console.log('Promise checkCredentials pending');
+    if (!email || !password) {
+      return Promise.reject('Promise checkCredentials rejected : no email or no password');
+    }
+
     let userFound = User.getUserFromList(email);
-    console.log("User::checkCredentials:", userFound, " password:", password);
-    if (!userFound) return Promise.resolve(false);
-    //try {
-    console.log("checkCredentials:prior to await");
-    // return the promise
-    return bcrypt
-      .compare(password, userFound.password)
-      .then((match) => match)
-      .catch((err) => err);
-  }
+    console.log("User:", userFound, " password:", password);
+    if (!userFound){
+      return Promise.reject('Promise checkCredentials rejected : user not found');
+   } 
+   try{
+     console.log('Promise BCRYPT.compare pending');
+     let match = await bcrypt.compare(password,userFound.password); //async
+     console.log('Promise BCRYPT.compare fulfilled, match :', match);
+     if (match){
+       return Promise.resolve(true);
+     }else{
+       return Promise.resolve(false);
+     }
+    }catch (error) {
+      console.log('Promise BCRYPT.compare rejected :', error);
+      return Promise.reject('Promise checkCredentials rejected : error in BCRYPT.compare');
+    };
+    }
 
   // Some example of bcrypt used with sync function
   /*
@@ -65,14 +83,13 @@ class User {
   }*/
 
   static get list() {
-    let userList = getUserListFromFile(FILE_PATH);
+    let userList = getUserListFromFile(USER_FILE);
     return userList;
   }
 
   static isUser(username) {
-    const userFound = User.getUserFromList(username);
-    console.log("User::isUser:", userFound);
-    return userFound !== undefined;
+   let userFound = User.getUserFromList(username);
+   return userFound !== undefined;
   }
 
   static getUserFromList(username) {

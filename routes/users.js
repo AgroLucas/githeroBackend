@@ -11,11 +11,13 @@ router.get("/", authorize, function (req, res, next) {
 });
 //REGISTER
 //POST /api/users/
-router.post("/", function (request,response) {
+router.post("/", async function (request,response) {
   if(User.isUser(request.body.email)){
     response.status(409).end(); // si conflict
   }else{
     let user = new User(request.body.email, request.body.email, request.body.password);
+   try{
+     await newUser.save(); // attendre resolution promesse de sauvgarde
     newUser.save();
     JWT.sign(
       {username: newUser.username }, //Payload
@@ -34,14 +36,20 @@ router.post("/", function (request,response) {
       }
     }
     );
-  } 
+  }  catch(error){
+     console.log(error);
+     response.status(500).end(); // serveur erreur
+  };
+  }
   } );
 
  //LOGIN
  //POST /api/login
- router.post("/login",function(request,response){
+ router.post("/login",async function(request,response){
    let user =new User(request.body.email, request.body.email, request.body.password);
-   if(user.checkCredentials(request.body.email,request.body.password)){
+   try{ 
+     let match = await user.checkCredentials(request.body.email, request.body.password);
+   if(match){
      JWT.sign(
       {username: user.username }, 
       JWTSECRET, 
@@ -61,6 +69,10 @@ router.post("/", function (request,response) {
    }else{
      response.status(401).end(); // pas authorisé
    }
+  } catch (error){
+    console.log(error);
+    response.status(401).end();
+  };
  });
 
 //USERS LIST
