@@ -1,66 +1,76 @@
-var express = require("express");
-var router = express.Router();
-var User = require("../model/User.js");
-let { authorize, signAsynchronous } = require("../utils/auth");
-const jwt = require("jsonwebtoken");
-const jwtSecret = "jkjJ1235Ohno!";
-const LIFETIME_JWT = 24 * 60 * 60 * 1000 ; // 10;// in seconds // 24 * 60 * 60 * 1000 = 24h 
+let express= require("express");
+let router = express.Router();
 
+const JWT = require("jsonwebtoken");
+const { response } = require("../app.js");
+const {JWTSECRET , JWTLIFETIME , authorize} = require ("../auth.js");
+let User = require("../model/User.js");
 /* GET user list : secure the route with JWT authorization */
 router.get("/", authorize, function (req, res, next) {
     return res.json(User.list);
 });
-
-/* POST user data for authentication */
-router.post("/login", function (req, res, next) {
-  let user = new User(req.body.email, req.body.email, req.body.password);
-  console.log("POST users/login:", User.list);
-  user.checkCredentials(req.body.email, req.body.password).then((match) => {
-    if (match) {
-      jwt.sign({ username: user.username }, jwtSecret,{ expiresIn: LIFETIME_JWT }, (err, token) => {
-        if (err) {
-          console.error("POST users/ :", err);
-          return res.status(500).send(err.message);
-        }
-        console.log("POST users/ token:", token);
-        return res.json({ username: user.username, token });
-      });
-    } else {
-      console.log("POST users/login Error:", "Unauthentified");
-      return res.status(401).send("bad email/password");
-    }
-  })  
-});
-
-/* POST a new user */
-router.post("/", function (req, res, next) {
-  console.log("POST users/", User.list);
-  console.log("email:", req.body.email);
-  if (User.isUser(req.body.email))
-    return res.status(409).end();
-  let newUser = new User(req.body.email, req.body.email, req.body.password);
-  newUser.save().then(() => {
-    console.log("afterRegisterOp:", User.list);
-    jwt.sign({ username: newUser.username}, jwtSecret,{ expiresIn: LIFETIME_JWT }, (err, token) => {
-      if (err) {
-        console.error("POST users/ :", err);
-        return res.status(500).send(err.message);
+//REGISTER
+//POST /api/users/
+router.post("/", function (request,response) {
+  if(User.isUser(request.body.email)){
+    response.status(409).end(); // si conflict
+  }else{
+    let user = new User(request.body.email, request.body.email, request.body.password);
+    newUser.save();
+    JWT.sign(
+      {username: newUser.username }, //Payload
+      JWTSECRET, //  PRIVATE KEY
+      { expiresIn: JWTLIFETIME },
+      (err, token) => { //callback
+        if (error) {
+          console.error("JWT.sign error:", error);
+          response.status(500).end(); // Serveur erreur
+        }else{
+          console.log("JWT.sign OK:", token);
+          response.json({ username: newUser.username, token });
+          //username retourné au client pour gerer son affichage et token envoyé au client , a lui de sauvgarder pour
+          //utilier des futures requetes necessitant une autorisation
+          //SPA est ainsi stateless
       }
-      console.log("POST users/ token:", token);
-      return res.json({ username: newUser.username, token });
-    });
+    }
+    );
+  } 
+  } );
+
+ //LOGIN
+ //POST /api/login
+ router.post("/login",function(request,response){
+   let user =new User(request.body.email, request.body.email, request.body.password);
+   if(user.checkCredentials(request.body.email,request.body.password)){
+     JWT.sign(
+      {username: user.username }, 
+      JWTSECRET, 
+      { expiresIn: JWTLIFETIME },
+      (err, token) => { 
+        if (error) {
+          console.error("JWT.sign error:", error);
+          response.status(500).end(); // Serveur erreur
+        }
+          console.log("JWT.sign OK, token:", token);
+          response.json({ username: newUser.username, token });
+          //username retourné au client pour gerer son affichage et token envoyé au client , a lui de sauvgarder pour
+          //utilier des futures requetes necessitant une autorisation
+          //SPA est ainsi stateless
+      }
+     );
+   }else{
+     response.status(401).end(); // pas authorisé
+   }
+ });
+
+//USERS LIST
+//GET /api/users/
+// avec my auth JWT middleware
+
+
+router.get("/",authorize, function (request , response) {
+ response.json({ userList: User.list });
   });
-});
 
-/* GET user object from username */
-router.get("/:username", function (req, res, next) {
-  console.log("GET users/:username", req.params.username);
-  const userFound = User.getUserFromList(req.params.username);
-  if (userFound) {
-    return res.json(userFound);
-  } else {
-    return res.status(404).send("ressource not found");
-  }
-});
+  module.exports = router;
 
-module.exports = router;
