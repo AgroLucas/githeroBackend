@@ -2,6 +2,7 @@
 const FILE_PATH = __dirname + "/musics.json";
 class Music {
     constructor (title, artist, musicData) {
+        console.log("enter new Music");
         this.title = title;
         this.artist = artist;
         this.musicData = musicData //base 64
