@@ -3,14 +3,14 @@ let express = require("express");
 let path = require("path");
 let cookieParser = require("cookie-parser");
 let logger = require("morgan");
-let helmet = require('helmet');
+//let helmet = require('helmet');
 
 let usersRouter = require("./routes/users");
 let beatmapRouter = require("./routes/beatmaps");
 
 let app = express();
 
-app.use(helmet());
+//app.use(helmet());
 app.use(logger("dev"));
 app.use(express.json({limit: "15mb"}));
 app.use(express.urlencoded({ 
