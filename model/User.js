@@ -39,7 +39,7 @@ class User {
     }
 
     let userFound = User.getUserFromList(email);
-    console.log("User:", userFound, " password:", password);
+    console.log("User:", userFound, ",  password:", password);
     if (!userFound){
       return Promise.reject('Promise checkCredentials rejected : user not found');
    } 

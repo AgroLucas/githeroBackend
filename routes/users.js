@@ -80,7 +80,7 @@ router.post("/", async function (request,response) {
 // avec my auth JWT middleware
 
 
-router.get("/",authorize, function (request , response) {
+router.get("/", authorize , function (request , response) {
  response.json({ userList: User.list });
   });
 
