@@ -2,13 +2,10 @@ let express= require("express");
 let router = express.Router();
 
 const JWT = require("jsonwebtoken");
-const { response } = require("../app.js");
 const {JWTSECRET , JWTLIFETIME , authorize} = require ("../utils/auth.js");
+
 let User = require("../model/User.js");
-/* GET user list : secure the route with JWT authorization */
-router.get("/", authorize, function (req, res, next) {
-    return res.json(User.list);
-});
+
 //REGISTER
 //POST /api/users/
 router.post("/", async function (request,response) {
@@ -79,7 +76,6 @@ router.post("/", async function (request,response) {
 //USERS LIST
 //GET /api/users/
 // avec my auth JWT middleware
-
 
 router.get("/", authorize , function (request , response) {
  response.json({ userList: User.list });

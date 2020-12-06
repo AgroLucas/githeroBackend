@@ -1,4 +1,3 @@
-let createError = require("http-errors");
 let express = require("express");
 let path = require("path");
 let cookieParser = require("cookie-parser");
@@ -29,17 +28,6 @@ app.use((req,res,next)=>{ //  su uri est pas trouve alors renvoie un fichier sta
 app.use("/api/users", usersRouter);
 app.use("/api/beatmaps", beatmapRouter);
 
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  next(createError(404));
-});
-
-// error handler
-app.use(function (err, req, res, next) {  
-  // render the error page
-  res.status(err.status || 500);
-  res.send(err.message);
-});
 
 
 module.exports = app;

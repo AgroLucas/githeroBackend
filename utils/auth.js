@@ -13,7 +13,7 @@ const User = require("../model/User.js");
 const authorize = (request,response,next) => {
   let token = request.get("Authorization"); //client should send his token to the server via http request 
   console.log("Middleware authorize: token received by header Authorization is" + token);
-   jwt.verify(token, JWTSECRET, (error, token) => {
+   JWT.verify(token, JWTSECRET, (error, token) => {
     if (error) {
       console.error("JWT.verify error:" + error.message);
       response.status(401); // pas authorisé
