@@ -58,7 +58,7 @@ router.post("/", async function (request,response) {
           response.status(500).end(); // Serveur erreur
         }else{
           console.log("JWT.sign OK, token:", token);
-          response.json({ username: newUser.username, token });
+          response.json({ username: user.username, token });
           //username retourné au client pour gerer son affichage et token envoyé au client , a lui de sauvgarder pour
           //utilier des futures requetes necessitant une autorisation
           //SPA est ainsi stateless
