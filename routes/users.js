@@ -15,7 +15,7 @@ router.post("/", async function (request,response) {
   if(User.isUser(request.body.email)){
     response.status(409).end(); // si conflict
   }else{
-    let user = new User(request.body.email, request.body.email, request.body.password);
+    let newUser = new User(request.body.email, request.body.email, request.body.password);
    try{
      await newUser.save(); // attendre resolution promesse de sauvgarde
     newUser.save();
@@ -23,7 +23,7 @@ router.post("/", async function (request,response) {
       {username: newUser.username }, //Payload
       JWTSECRET, //  PRIVATE KEY
       { expiresIn: JWTLIFETIME },
-      (err, token) => { //callback
+      (error, token) => { //callback
         if (error) {
           console.error("JWT.sign error:", error);
           response.status(500).end(); // Serveur erreur
@@ -54,16 +54,17 @@ router.post("/", async function (request,response) {
       {username: user.username }, 
       JWTSECRET, 
       { expiresIn: JWTLIFETIME },
-      (err, token) => { 
+      (error, token) => { 
         if (error) {
           console.error("JWT.sign error:", error);
           response.status(500).end(); // Serveur erreur
-        }
+        }else{
           console.log("JWT.sign OK, token:", token);
           response.json({ username: newUser.username, token });
           //username retourné au client pour gerer son affichage et token envoyé au client , a lui de sauvgarder pour
           //utilier des futures requetes necessitant une autorisation
           //SPA est ainsi stateless
+        }
       }
      );
    }else{
