@@ -1,8 +1,7 @@
-"strict mode";
-const bcrypt = require("bcrypt");
-const saltRounds = 10;
-const myPlaintextPassword = "145OkyayNo668Pass";
-const FILE_PATH = __dirname + "/users.json";
+"use strict";
+const BCRYPT = require("bcrypt");
+const SALTROUNDS = 10;
+const USERS_FILE = __dirname + "/users.json";
 
 class User {
   constructor(username, email, password) {
@@ -14,13 +13,13 @@ class User {
   /* return a promise with async / await */ 
   async save() {
     console.log('Promise save pending');
-    let userList = getUserListFromFile(USER_FILE);
+    let userList = getUserListFromFile(USERS_FILE);
     try{
       console.log('Promise BCRYPT.hash pending');
-      let hashedPassword = await bcrypt.hash(this.password, SALTROUNDS); //async attendre return de hash
+      let hashedPassword = await BCRYPT.hash(this.password, SALTROUNDS); //async attendre return de hash
       console.log('Promise BCRYPT.hash fulfilled, hashedPassword :', hashedPassword);
       userList.push({username: this.email, email: this.email, password: hashedPassword});
-      saveUserListToFile(USER_FILE,userList);
+      saveUserListToFile(USERS_FILE,userList);
       console.log('Promise save fulfilled');
       return Promise.resolve(true);
     }catch(error){
@@ -45,7 +44,7 @@ class User {
    } 
    try{
      console.log('Promise BCRYPT.compare pending');
-     let match = await bcrypt.compare(password,userFound.password); //async
+     let match = await BCRYPT.compare(password,userFound.password); //async
      console.log('Promise BCRYPT.compare fulfilled, match :', match);
      if (match){
        return Promise.resolve(true);
