@@ -1,7 +1,8 @@
 "use strict";
 const BCRYPT = require("bcrypt");
 const SALTROUNDS = 10;
-const USERS_FILE = __dirname + "/users.json";
+const FILE_PATH = __dirname + "/users.json";
+
 
 class User {
   constructor(username, email, password) {
@@ -13,13 +14,13 @@ class User {
   /* return a promise with async / await */ 
   async save() {
     console.log('Promise save pending');
-    let userList = getUserListFromFile(USERS_FILE);
+    let userList = getUserListFromFile(FILE_PATH);
     try{
       console.log('Promise BCRYPT.hash pending');
       let hashedPassword = await BCRYPT.hash(this.password, SALTROUNDS); //async attendre return de hash
       console.log('Promise BCRYPT.hash fulfilled, hashedPassword :', hashedPassword);
       userList.push({username: this.email, email: this.email, password: hashedPassword});
-      saveUserListToFile(USERS_FILE,userList);
+      saveUserListToFile(FILE_PATH,userList);
       console.log('Promise save fulfilled');
       return Promise.resolve(true);
     }catch(error){
@@ -82,7 +83,7 @@ class User {
   }*/
 
   static get list() {
-    let userList = getUserListFromFile(USER_FILE);
+    let userList = getUserListFromFile(FILE_PATH);
     return userList;
   }
 
