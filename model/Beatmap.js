@@ -29,8 +29,20 @@ class Beatmap {
         return beatmapID;
     }
 
+    //Return list of beatmap
     static getList(){
-        return getBMListFromFile(FILE_PATH);
+        let list = getBMListFromFile(FILE_PATH);
+        return list.map(item => {
+            const data = Beatmap.getBeatmapFromList(item.beatmapID);
+            return {
+                beatmapID: data.beatmapID,
+                musicTitle: data.musicTitle,
+                musicArtist: data.musicArtist,
+                creator: data.creator,
+                difficulty: data.difficulty,
+                leaderboard: data.leaderboard
+            }
+        });
     }
 
     //returns if there is a beatmap & music stored that matches the beatmapID
