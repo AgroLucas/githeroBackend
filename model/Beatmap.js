@@ -4,11 +4,9 @@ var Music = require("./Music.js");
 const FILE_PATH = __dirname + "/beatmaps.json";
 class Beatmap {
     constructor(noteList, difficulty, musicTitle, musicData, songArtist, bmCreator, leaderboard){
-        console.log("enter new BM");
         this.noteList = noteList; // array of [noteType(int 0-1), lineNbr(int 0-3), startTime (int ms), endTime(int ms, optionnal)]
         this.creator = bmCreator;
         this.difficulty = difficulty; // String
-        console.log("before new Music");
         this.musicObj = new Music(musicTitle, songArtist,  musicData);
         this.leaderboard = leaderboard; // array of 10 * {username: str, score: int}
     }
