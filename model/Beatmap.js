@@ -2,13 +2,14 @@
 var Music = require("./Music.js");
 
 const FILE_PATH = __dirname + "/beatmaps.json";
+const DEFAULT_FILE_PATH = __dirname + "/defaultBeatmaps.json";
 class Beatmap {
-    constructor(noteList, difficulty, musicTitle, musicData, songArtist, bmCreator, leaderboard){
+    constructor(noteList, difficulty, musicTitle, musicData, songArtist, musicDuration, bmCreator){
         this.noteList = noteList; // array of [noteType(int 0-1), lineNbr(int 0-3), startTime (int ms), endTime(int ms, optionnal)]
         this.creator = bmCreator;
         this.difficulty = difficulty; // String
-        this.musicObj = new Music(musicTitle, songArtist,  musicData);
-        this.leaderboard = leaderboard; // array of 10 * {username: str, score: int}
+        this.musicObj = new Music(musicTitle, songArtist,  musicData, musicDuration);
+        this.leaderboard = []; // array of 10 * {username: str, score: int}
     }
 
     save() {
@@ -29,34 +30,60 @@ class Beatmap {
 
     //Return list of beatmap
     static getList(){
-        let list = getBMListFromFile(FILE_PATH);
+        let list = getBMListFromFile(DEFAULT_FILE_PATH).concat(getBMListFromFile(FILE_PATH)); //list = Default + Published beatmaps
         return list.map(item => {
             const data = Beatmap.getBeatmapFromList(item.beatmapID);
             return {
                 beatmapID: data.beatmapID,
                 musicTitle: data.musicTitle,
                 musicArtist: data.musicArtist,
+                musicDuration: data.musicDuration,
                 creator: data.creator,
                 difficulty: data.difficulty,
-                leaderboard: data.leaderboard
+                leaderboard: data.leaderboard,
             }
         });
     }
 
-    //returns if there is a beatmap & music stored that matches the beatmapID
+    //returns if there is a beatmap & music stored that matches the beatmapID (+musicID inside beatmap)
     static isBeatmap(beatmapID) {
-        if(beatmapID < 0) return false;
-        let beatmapList = getBMListFromFile(FILE_PATH);
+        console.log("isBeatmap");
+        if(beatmapID < 0) { //neg ID -> default ?
+            console.log("default");
+            let defaultBeatmapList = getBMListFromFile(DEFAULT_FILE_PATH);
+            //console.log("defaultBeatmapList: ", defaultBeatmapList);
+            for(let i=0; i<defaultBeatmapList.length; i++){
+                console.log(defaultBeatmapList[i].beatmapID, beatmapID);
+                if(defaultBeatmapList[i].beatmapID == beatmapID){
+                    return Music.isMusic(defaultBeatmapList[i].musicID); // BM found -> is there a music that matches musicID ?
+                }
+            }
+            return false; //no default bm found
+        }
+        let beatmapList = getBMListFromFile(FILE_PATH); //positive ID -> published ?
         if(beatmapID >= beatmapList.length) return false;
-        return Music.isMusic(beatmapList[beatmapID].musicID); // is there a music that matches musicID ?
+        return Music.isMusic(beatmapList[beatmapID].musicID); // BM found -> is there a music that matches musicID ?
     }
 
     static getBeatmapFromList(beatmapID) {
-        let beatmapList = getBMListFromFile(FILE_PATH);
-        if(beatmapID < 0 || beatmapID >= beatmapList.length){
-            return;
+        console.log("getBeatmapFromList");
+        let bm;
+        if(beatmapID >= 0){ //published
+            let beatmapList = getBMListFromFile(FILE_PATH);
+            if(beatmapID < 0 || beatmapID >= beatmapList.length){
+                return;
+            }
+            bm = beatmapList[beatmapID];
+        }else { //default
+            let defaultBeatmapList = getBMListFromFile(DEFAULT_FILE_PATH);
+            let i=0;
+            while(i<defaultBeatmapList.length && !bm){
+                if(defaultBeatmapList[i].beatmapID == beatmapID){
+                    bm = defaultBeatmapList[i];
+                }
+                i++;
+            }
         }
-        let bm = beatmapList[beatmapID];
         let music = Music.getMusicFromList(bm.musicID);
         if(music === null){
             return;
@@ -71,6 +98,7 @@ class Beatmap {
             musicTitle: music.title,
             musicArtist: music.artist,
             musicData: music.data,
+            musicDuration: music.duration,
         }
         return res;
     }

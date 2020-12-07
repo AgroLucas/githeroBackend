@@ -1,11 +1,15 @@
 "strict mode";
 const FILE_PATH = __dirname + "/musics.json";
+const DEFAULT_FILE_PATH = __dirname + "/defaultMusics.json";
 class Music {
-    constructor (title, artist, musicData) {
-        console.log("enter new Music");
+    constructor (title, artist, musicData, musicDuration) {
+        console.log("title: ", title);
+        console.log("artist: ", artist);
+        console.log("duration: ", musicDuration);
         this.title = title;
         this.artist = artist;
         this.musicData = musicData //base 64
+        this.duration = musicDuration;
     }
 
     // attributes and returns an id for the song (id = index in the array)
@@ -18,23 +22,45 @@ class Music {
             title: this.title,
             artist: this.artist,
             data: this.musicData,
+            duration: this.duration,
         });
         saveMusicListToFile(FILE_PATH, musicList);
         return musicID;
     }
 
     static isMusic(musicID){
-        if(musicID < 0) return false;
+        console.log("isMusic");
+        if(musicID < 0) { //default music ?
+            let defaultMusicList = getMusicListFromFile(DEFAULT_FILE_PATH);
+            for(let i=0; i<defaultMusicList.length; i++){
+                if(defaultMusicList[i].musicID == musicID){
+                    console.log("true");
+                    return true;
+                }
+            }
+            return false;
+        } //music posted by user ?
         let musicList = getMusicListFromFile(FILE_PATH);
         return musicID < musicList.length;
     }
 
     static getMusicFromList(musicID){
-        let musicList = getMusicListFromFile(FILE_PATH);
-        if(musicID < 0 || musicID > musicList.length){
-            return;
+        if(musicID >= 0){ //not in default musics
+            let musicList = getMusicListFromFile(FILE_PATH);
+            if(musicID > musicList.length){
+                return;
+            }
+            return musicList[musicID];
+        }else{  //in default musics ?
+            let defaultMusicList = getMusicListFromFile(DEFAULT_FILE_PATH);
+            for(let i=0; i<defaultMusicList.length; i++){
+                if(defaultMusicList[i].musicID == musicID){
+                    return defaultMusicList[i];
+                }
+            }
+            return; //no music found in defult music list
         }
-        return musicList[musicID];
+        
     }
 }
 
