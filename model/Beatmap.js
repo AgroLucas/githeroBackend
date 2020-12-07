@@ -85,7 +85,7 @@ class Beatmap {
             }
         }
         let music = Music.getMusicFromList(bm.musicID);
-        let leaderboard = getLeaderboardFromBeatmapID(beatmapID);
+        let leaderboard = this.getLeaderboardFromBeatmapID(beatmapID);
         if(music === null){
             return;
         }
