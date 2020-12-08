@@ -4,7 +4,7 @@ var Music = require("./Music.js");
 const FILE_PATH = __dirname + "/beatmaps.json";
 const LEADERBOARD_FILE_PATH = __dirname + "/leaderboards.json";
 const DEFAULT_FILE_PATH = __dirname + "/defaultBeatmaps.json";
-const LEADERBOARD_SIZE = 10;
+const LEADERBOARD_SIZE = 5;
 class Beatmap {
     constructor(noteList, difficulty, musicTitle, musicData, songArtist, musicDuration, bmCreator){
         this.noteList = noteList; // array of [noteType(int 0-1), lineNbr(int 0-3), startTime (int ms), endTime(int ms, optionnal)]
