@@ -5,10 +5,11 @@ const FILE_PATH = __dirname + "/users.json";
 
 
 class User {
-  constructor(username, email, password) {
+  constructor(username, email, password,highscore) {
     this.username = username;
     this.email = email;
     this.password = password;
+    this.highscore = 0;
   }
 
   /* return a promise with async / await */ 
