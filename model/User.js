@@ -19,7 +19,7 @@ class User {
       console.log('Promise BCRYPT.hash pending');
       let hashedPassword = await BCRYPT.hash(this.password, SALTROUNDS); //async attendre return de hash
       console.log('Promise BCRYPT.hash fulfilled, hashedPassword :', hashedPassword);
-      userList.push({username: this.email, email: this.email, password: hashedPassword});
+      userList.push({username: this.username, email: this.email, password: hashedPassword});
       saveUserListToFile(FILE_PATH,userList);
       console.log('Promise save fulfilled');
       return Promise.resolve(true);
@@ -32,13 +32,13 @@ class User {
   
 
   /* return a promise with classic promise syntax*/
-  async checkCredentials(email, password) {
+  async checkCredentials(username, password) {
    console.log('Promise checkCredentials pending');
-    if (!email || !password) {
+    if (!username || !password) {
       return Promise.reject('Promise checkCredentials rejected : no email or no password');
     }
 
-    let userFound = User.getUserFromList(email);
+    let userFound = User.getUserFromList(username);
     console.log("User:", userFound, ",  password:", password);
     if (!userFound){
       return Promise.reject('Promise checkCredentials rejected : user not found');
