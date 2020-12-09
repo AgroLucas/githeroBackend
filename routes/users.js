@@ -13,7 +13,7 @@ router.post("/", async function (request,response) {
   if(User.isUser(request.body.username) || User.isUser(request.body.email)){
     response.status(409).end(); // si conflict
   }else{
-    let newUser = new User(request.body.username, request.body.email, request.body.password);
+    let newUser = new User(request.body.username, request.body.email, request.body.password,request.body.highscore,request.body.isAdmin);
    try{
      await newUser.save(); // attendre resolution promesse de sauvgarde
     newUser.save();
@@ -44,7 +44,7 @@ router.post("/", async function (request,response) {
  //LOGIN
  //POST /api/login
  router.post("/login",async function(request,response){
-   let user =new User(request.body.username, request.body.email, request.body.password);
+   let user =new User(request.body.username, request.body.email, request.body.password,request.body.highscore,request.body.isAdmin);
    try{ 
      let match = await user.checkCredentials(request.body.username, request.body.password);
    if(match){

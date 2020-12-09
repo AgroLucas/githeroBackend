@@ -5,11 +5,12 @@ const FILE_PATH = __dirname + "/users.json";
 
 
 class User {
-  constructor(username, email, password,highscore) {
+  constructor(username, email, password,highscore,isAdmin) {
     this.username = username;
     this.email = email;
     this.password = password;
     this.highscore = 0;
+    this.isAdmin = false;
   }
 
   /* return a promise with async / await */ 
@@ -20,7 +21,7 @@ class User {
       console.log('Promise BCRYPT.hash pending');
       let hashedPassword = await BCRYPT.hash(this.password, SALTROUNDS); //async attendre return de hash
       console.log('Promise BCRYPT.hash fulfilled, hashedPassword :', hashedPassword);
-      userList.push({username: this.username, email: this.email, password: hashedPassword});
+      userList.push({username: this.username, email: this.email, password: hashedPassword, highscore: 0, isAdmin: false });
       saveUserListToFile(FILE_PATH,userList);
       console.log('Promise save fulfilled');
       return Promise.resolve(true);
@@ -92,6 +93,7 @@ class User {
    let userFound = User.getUserFromList(username);
    return userFound !== undefined;
   }
+  // rajouter isAdmin
 
   static getUserFromList(username) {
     const userList = getUserListFromFile(FILE_PATH);
