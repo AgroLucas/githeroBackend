@@ -5,10 +5,14 @@ const FILE_PATH = __dirname + "/users.json";
 
 
 class User {
-  constructor(username, email, password) {
+  constructor(username, email, password, highscores) {
     this.username = username;
     this.email = email;
     this.password = password;
+    if (!highscores)
+      this.highscores = [];
+    else 
+      this.highscores = highscores
   }
 
   /* return a promise with async / await */ 
@@ -19,7 +23,7 @@ class User {
       console.log('Promise BCRYPT.hash pending');
       let hashedPassword = await BCRYPT.hash(this.password, SALTROUNDS); //async attendre return de hash
       console.log('Promise BCRYPT.hash fulfilled, hashedPassword :', hashedPassword);
-      userList.push({username: this.email, email: this.email, password: hashedPassword});
+      userList.push({username: this.email, email: this.email, password: hashedPassword, highscores: this.highscores});
       saveUserListToFile(FILE_PATH,userList);
       console.log('Promise save fulfilled');
       return Promise.resolve(true);
@@ -56,31 +60,7 @@ class User {
       console.log('Promise BCRYPT.compare rejected :', error);
       return Promise.reject('Promise checkCredentials rejected : error in BCRYPT.compare');
     };
-    }
-
-  // Some example of bcrypt used with sync function
-  /*
-  save() {
-    let userList = getUserListFromFile(FILE_PATH);
-    const hashedPassword = bcrypt.hashSync(this.password, saltRounds);
-
-    userList.push({
-      username: this.email,
-      email: this.email,
-      password: hashedPassword,
-    });
-
-    saveUserListToFile(FILE_PATH, userList);
   }
-
-  checkCredentials(email, password) {
-    if (!email || !password) return false;
-    let userFound = User.getUserFromList(email);
-    console.log("User::checkCredentials:", userFound, " password:", password);
-    if (!userFound) return false;
-    const match = bcrypt.compareSync(password, userFound.password);
-    return match;
-  }*/
 
   static get list() {
     let userList = getUserListFromFile(FILE_PATH);
@@ -99,6 +79,44 @@ class User {
     }
     return;
   }
+  
+  static getHighscore(username, idBeatMap) { 
+    let user = User.getUserFromList(username);
+    let result;
+    user.highscores.every( scores => {
+      if (scores.idBeatMap === idBeatMap ) {
+        result = scores.highscore
+        return false;
+      }
+      return true;
+    });
+    return result;
+  } 
+  
+  static setHighscore(username, idBeatMap, highscore) {
+    let list = getUserListFromFile(FILE_PATH);
+    list.forEach(element => {
+      if (element.username === username) {
+        let flag;
+        element.highscores.every(scores => {
+          if (scores.idBeatMap === idBeatMap) {
+            flag = "false";
+            scores.highscore = highscore;
+            return false;
+          }
+          return true;
+        });
+        if (typeof(flag) === "undefined") {
+          let score = {};
+          score.idBeatMap = idBeatMap;
+          score.highscore = highscore;
+          element.highscores.push(score);
+        }
+      }
+    });
+    saveUserListToFile(FILE_PATH, list);
+  }
+
 }
 
 function getUserListFromFile(filePath) {
@@ -116,5 +134,6 @@ function saveUserListToFile(filePath, userList) {
   let data = JSON.stringify(userList);
   fs.writeFileSync(filePath, data);
 }
+
 
 module.exports = User;

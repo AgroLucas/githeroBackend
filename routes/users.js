@@ -82,5 +82,16 @@ router.get("/", authorize , function (request , response) {
  response.json({ userList: User.list });
   });
 
+
+router.post("/score", /*authorize ,*/ function (request , response) {                 //TODO authorize doesn't work
+  let highscore = User.getHighscore(request.body.username, request.body.beatmapId);
+  if (!highscore) 
+    highscore = 0;
+  if (highscore < request.body.score)
+    User.setHighscore(request.body.username, request.body.beatmapId, request.body.score);
+  response.json({ oldHighscore: highscore });
+  });
+
+
   module.exports = router;
 
