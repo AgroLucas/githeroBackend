@@ -1,11 +1,12 @@
 "use strict";
 const BCRYPT = require("bcrypt");
+const { getMaxListeners } = require("process");
 const SALTROUNDS = 10;
 const FILE_PATH = __dirname + "/users.json";
 
 
 class User {
-  constructor(username, email, password, highscores) {
+  constructor(username, email, password, highscores, isAdmin) {
     this.username = username;
     this.email = email;
     this.password = password;
@@ -13,7 +14,12 @@ class User {
       this.highscores = [];
     else 
       this.highscores = highscores
+    this.isAdmin = false
   }
+  //compte admin :
+  //username : admin
+  //password : !Admin123!
+  
 
   /* return a promise with async / await */ 
   async save() {
@@ -23,7 +29,7 @@ class User {
       console.log('Promise BCRYPT.hash pending');
       let hashedPassword = await BCRYPT.hash(this.password, SALTROUNDS); //async attendre return de hash
       console.log('Promise BCRYPT.hash fulfilled, hashedPassword :', hashedPassword);
-      userList.push({username: this.email, email: this.email, password: hashedPassword, highscores: this.highscores});
+      userList.push({username: this.username, email: this.email, password: hashedPassword, highscores: this.highscores, isAdmin: false});
       saveUserListToFile(FILE_PATH,userList);
       console.log('Promise save fulfilled');
       return Promise.resolve(true);
@@ -36,13 +42,13 @@ class User {
   
 
   /* return a promise with classic promise syntax*/
-  async checkCredentials(email, password) {
+  async checkCredentials(username, password) {
    console.log('Promise checkCredentials pending');
-    if (!email || !password) {
+    if (!username || !password) {
       return Promise.reject('Promise checkCredentials rejected : no email or no password');
     }
 
-    let userFound = User.getUserFromList(email);
+    let userFound = User.getUserFromList(username);
     console.log("User:", userFound, ",  password:", password);
     if (!userFound){
       return Promise.reject('Promise checkCredentials rejected : user not found');
@@ -66,13 +72,29 @@ class User {
     let userList = getUserListFromFile(FILE_PATH);
     return userList;
   }
+  static get adminList() {
+    let adminList = getAdminListFromFile(FILE_PATH);
+    return adminList;
+  }
+
 
   static isUser(username) {
    let userFound = User.getUserFromList(username);
    return userFound !== undefined;
   }
-
-  static getUserFromList(username) {
+  static isAdmin(username) {
+    let userFound = User.getAdminFromList(username);
+    return userFound !== undefined;
+   }
+   static getAdminFromList(username) {
+    const adminList = getAdminListFromFile(FILE_PATH);
+    for (let index = 0; index < adminList.length; index++) {
+      if (adminList[index].username === username && username.isAdmin ===true) return adminList[index];
+    }
+    return;
+  }
+  
+   static getUserFromList(username) {
     const userList = getUserListFromFile(FILE_PATH);
     for (let index = 0; index < userList.length; index++) {
       if (userList[index].username === username) return userList[index];
@@ -119,7 +141,7 @@ class User {
 
 }
 
-function getUserListFromFile(filePath) {
+  function getUserListFromFile(filePath) {
   const fs = require("fs");
   if (!fs.existsSync(filePath)) return [];
   let userListRawData = fs.readFileSync(filePath);
@@ -127,6 +149,20 @@ function getUserListFromFile(filePath) {
   if (userListRawData) userList = JSON.parse(userListRawData);
   else userList = [];
   return userList;
+}
+function getAdminListFromFile(filePath) {
+  const fs = require("fs");
+  if (!fs.existsSync(filePath)) return [];
+  let adminListRawData = fs.readFileSync(filePath);
+  let adminList;
+  if (adminListRawData) adminList = JSON.parse(adminListRawData);
+  else adminList = [];
+  return adminList;
+}
+function saveAdminListToFile(filePath, adminList) {
+  const fs = require("fs");
+  let data = JSON.stringify(adminList);
+  fs.writeFileSync(filePath, data);
 }
 
 function saveUserListToFile(filePath, userList) {

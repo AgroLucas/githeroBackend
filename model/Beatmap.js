@@ -2,15 +2,15 @@
 var Music = require("./Music.js");
 
 const FILE_PATH = __dirname + "/beatmaps.json";
+const LEADERBOARD_FILE_PATH = __dirname + "/leaderboards.json";
+const DEFAULT_FILE_PATH = __dirname + "/defaultBeatmaps.json";
+const LEADERBOARD_SIZE = 5;
 class Beatmap {
-    constructor(noteList, difficulty, musicTitle, musicData, songArtist, bmCreator, leaderboard){
-        console.log("enter new BM");
+    constructor(noteList, difficulty, musicTitle, musicData, songArtist, musicDuration, bmCreator){
         this.noteList = noteList; // array of [noteType(int 0-1), lineNbr(int 0-3), startTime (int ms), endTime(int ms, optionnal)]
         this.creator = bmCreator;
         this.difficulty = difficulty; // String
-        console.log("before new Music");
-        this.musicObj = new Music(musicTitle, songArtist,  musicData);
-        this.leaderboard = leaderboard; // array of 10 * {username: str, score: int}
+        this.musicObj = new Music(musicTitle, songArtist,  musicData, musicDuration);
     }
 
     save() {
@@ -22,32 +22,70 @@ class Beatmap {
             noteList: this.noteList,
             difficulty: this.difficulty,
             creator: this.creator,
-            leaderboard: this.leaderboard,
             musicID: musicID,
         });
-        saveBMListToFile(FILE_PATH, beatmapList);
+        saveToFile(FILE_PATH, beatmapList);
         return beatmapID;
     }
 
+    //Return list of beatmap
     static getList(){
-        return getBMListFromFile(FILE_PATH);
+        let list = getBMListFromFile(DEFAULT_FILE_PATH).concat(getBMListFromFile(FILE_PATH)); //list = Default + Published beatmaps
+        return list.map(item => {
+            const data = Beatmap.getBeatmapFromList(item.beatmapID);
+            return {
+                beatmapID: data.beatmapID,
+                musicTitle: data.musicTitle,
+                musicArtist: data.musicArtist,
+                musicDuration: data.musicDuration,
+                creator: data.creator,
+                difficulty: data.difficulty,
+                leaderboard: data.leaderboard,
+            }
+        });
     }
 
-    //returns if there is a beatmap & music stored that matches the beatmapID
+    //returns if there is a beatmap & music stored that matches the beatmapID (+musicID inside beatmap)
     static isBeatmap(beatmapID) {
-        if(beatmapID < 0) return false;
-        let beatmapList = getBMListFromFile(FILE_PATH);
+        console.log("isBeatmap");
+        if(beatmapID < 0) { //neg ID -> default ?
+            console.log("default");
+            let defaultBeatmapList = getBMListFromFile(DEFAULT_FILE_PATH);
+            //console.log("defaultBeatmapList: ", defaultBeatmapList);
+            for(let i=0; i<defaultBeatmapList.length; i++){
+                console.log(defaultBeatmapList[i].beatmapID, beatmapID);
+                if(defaultBeatmapList[i].beatmapID == beatmapID){
+                    return Music.isMusic(defaultBeatmapList[i].musicID); // BM found -> is there a music that matches musicID ?
+                }
+            }
+            return false; //no default bm found
+        }
+        let beatmapList = getBMListFromFile(FILE_PATH); //positive ID -> published ?
         if(beatmapID >= beatmapList.length) return false;
-        return Music.isMusic(beatmapList[beatmapID].musicID); // is there a music that matches musicID ?
+        return Music.isMusic(beatmapList[beatmapID].musicID); // BM found -> is there a music that matches musicID ?
     }
 
     static getBeatmapFromList(beatmapID) {
-        let beatmapList = getBMListFromFile(FILE_PATH);
-        if(beatmapID < 0 || beatmapID >= beatmapList.length){
-            return;
+        console.log("getBeatmapFromList");
+        let bm;
+        if(beatmapID >= 0){ //published
+            let beatmapList = getBMListFromFile(FILE_PATH);
+            if(beatmapID < 0 || beatmapID >= beatmapList.length){
+                return;
+            }
+            bm = beatmapList[beatmapID];
+        }else { //default
+            let defaultBeatmapList = getBMListFromFile(DEFAULT_FILE_PATH);
+            let i=0;
+            while(i<defaultBeatmapList.length && !bm){
+                if(defaultBeatmapList[i].beatmapID == beatmapID){
+                    bm = defaultBeatmapList[i];
+                }
+                i++;
+            }
         }
-        let bm = beatmapList[beatmapID];
         let music = Music.getMusicFromList(bm.musicID);
+        let leaderboard = this.getLeaderboardFromBeatmapID(beatmapID);
         if(music === null){
             return;
         }
@@ -56,13 +94,45 @@ class Beatmap {
             noteList: bm.noteList,
             difficulty: bm.difficulty,
             creator: bm.creator,
-            leaderboard: bm.leaderboard,
+            leaderboard: leaderboard,
             musicID: music.musicID,
             musicTitle: music.title,
             musicArtist: music.artist,
             musicData: music.data,
+            musicDuration: music.duration,
         }
         return res;
+    }
+
+    static getLeaderboardFromBeatmapID(beatmapID){
+        let lbMap = getLBMapFromFile(LEADERBOARD_FILE_PATH);
+        if(!lbMap[beatmapID]){
+            return []; //empty leaderboard
+        }
+        return lbMap[beatmapID];
+    }
+
+    static updateLeaderboard(beatmapID, score, username){
+        let leaderboard = this.getLeaderboardFromBeatmapID(beatmapID);
+        let i = leaderboard.length;
+        while(leaderboard[i].score < score && i >= 0){
+            i--;
+        }
+        if(i>=LEADERBOARD_SIZE){
+            return; // not in leaderboard
+        }
+        let entry = {
+            score: score,
+            username: username,
+        }
+        leaderboard.splice(i, 0, entry); // insert entry in 
+        while(leaderboard.length > LEADERBOARD_SIZE){
+            leaderboard.splice(leaderboard.length-1, 1); //remove eccess entries
+        }
+
+        let lbMap = getLBMapFromFile(LEADERBOARD_FILE_PATH);
+        lbMap[beatmapID]=leaderboard;
+        saveToFile(LEADERBOARD_FILE_PATH, lbMap);
     }
 }
 
@@ -76,10 +146,20 @@ function getBMListFromFile(filePath) {
     return bmList;
 }
   
-function saveBMListToFile(filePath, bmList) {
+function saveToFile(filePath, data) {
     const fs = require("fs");
-    let data = JSON.stringify(bmList);
-    fs.writeFileSync(filePath, data);
+    let jsonData = JSON.stringify(data);
+    fs.writeFileSync(filePath, jsonData);
+}
+
+function getLBMapFromFile(filePath) {
+    const fs = require("fs");
+    if(!fs.existsSync(filePath)) return {};
+    let lbListRawData = fs.readFileSync(filePath);
+    let lbList;
+    if(lbListRawData) lbList = JSON.parse(lbListRawData);
+    else lbList = [];
+    return lbList;
 }
 
 module.exports = Beatmap;

@@ -27,6 +27,6 @@ const authorize = (request,response,next) => {
       }
     }
   });
-      };
+};
 
 module.exports = { JWTSECRET,JWTLIFETIME,authorize};
