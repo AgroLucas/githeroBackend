@@ -3,9 +3,6 @@ const FILE_PATH = __dirname + "/musics.json";
 const DEFAULT_FILE_PATH = __dirname + "/defaultMusics.json";
 class Music {
     constructor (title, artist, musicData, musicDuration) {
-        console.log("title: ", title);
-        console.log("artist: ", artist);
-        console.log("duration: ", musicDuration);
         this.title = title;
         this.artist = artist;
         this.musicData = musicData //base 64
@@ -16,7 +13,6 @@ class Music {
     save() {
         let musicList = getMusicListFromFile(FILE_PATH);
         let musicID = musicList.length;
-        console.log("save music (id = " + musicID + ")");
         musicList.push({
             musicID: musicID,
             title: this.title,
@@ -29,12 +25,10 @@ class Music {
     }
 
     static isMusic(musicID){
-        console.log("isMusic");
         if(musicID < 0) { //default music ?
             let defaultMusicList = getMusicListFromFile(DEFAULT_FILE_PATH);
             for(let i=0; i<defaultMusicList.length; i++){
                 if(defaultMusicList[i].musicID == musicID){
-                    console.log("true");
                     return true;
                 }
             }

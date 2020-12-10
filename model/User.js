@@ -105,7 +105,6 @@ class User {
   static getHighscore(username, idBeatMap) { 
     let user = User.getUserFromList(username);
     let result;
-    console.log(user);
     user.highscores.every( scores => {
       if (scores.idBeatMap === idBeatMap ) {
         result = scores.highscore

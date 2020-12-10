@@ -49,13 +49,9 @@ class Beatmap {
 
     //returns if there is a beatmap & music stored that matches the beatmapID (+musicID inside beatmap)
     static isBeatmap(beatmapID) {
-        console.log("isBeatmap");
         if(beatmapID < 0) { //neg ID -> default ?
-            console.log("default");
             let defaultBeatmapList = getBMListFromFile(DEFAULT_FILE_PATH);
-            //console.log("defaultBeatmapList: ", defaultBeatmapList);
             for(let i=0; i<defaultBeatmapList.length; i++){
-                console.log(defaultBeatmapList[i].beatmapID, beatmapID);
                 if(defaultBeatmapList[i].beatmapID == beatmapID){
                     return Music.isMusic(defaultBeatmapList[i].musicID); // BM found -> is there a music that matches musicID ?
                 }
@@ -68,7 +64,6 @@ class Beatmap {
     }
 
     static getBeatmapFromList(beatmapID) {
-        console.log("getBeatmapFromList");
         let bm;
         if(beatmapID >= 0){ //published
             let beatmapList = getBMListFromFile(FILE_PATH);
