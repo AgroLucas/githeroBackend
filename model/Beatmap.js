@@ -34,6 +34,10 @@ class Beatmap {
         let list = getBMListFromFile(DEFAULT_FILE_PATH).concat(getBMListFromFile(FILE_PATH)); //list = Default + Published beatmaps
         return list.map(item => {
             const data = Beatmap.getBeatmapFromList(item.beatmapID);
+            let highscore = 0;
+            if(username !== "null")
+                highscore = User.getHighscore(username, data.beatmapID);
+        
             return {
                 beatmapID: data.beatmapID,
                 musicTitle: data.musicTitle,
@@ -42,7 +46,7 @@ class Beatmap {
                 creator: data.creator,
                 difficulty: data.difficulty,
                 leaderboard: data.leaderboard,
-                highscore: username !== "null" ? User.getHighscore(username, data.beatmapID) : 0
+                highscore: highscore ? highscore : 0
             }
         });
     }
