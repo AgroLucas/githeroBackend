@@ -83,7 +83,7 @@ router.get("/", authorize , function (request , response) {
   });
 
 
-router.post("/score", /*authorize ,*/ function (request , response) {                 //TODO authorize doesn't work
+router.post("/score", authorize , function (request , response) {                 //TODO authorize doesn't work
   let highscore = User.getHighscore(request.body.username, request.body.beatmapId);
   if (!highscore) 
     highscore = 0;
