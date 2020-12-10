@@ -1,5 +1,6 @@
 "strict mode";
 var Music = require("./Music.js");
+const User = require("./User.js");
 
 const FILE_PATH = __dirname + "/beatmaps.json";
 const LEADERBOARD_FILE_PATH = __dirname + "/leaderboards.json";
@@ -29,7 +30,7 @@ class Beatmap {
     }
 
     //Return list of beatmap
-    static getList(){
+    static getList(username){
         let list = getBMListFromFile(DEFAULT_FILE_PATH).concat(getBMListFromFile(FILE_PATH)); //list = Default + Published beatmaps
         return list.map(item => {
             const data = Beatmap.getBeatmapFromList(item.beatmapID);
@@ -41,6 +42,7 @@ class Beatmap {
                 creator: data.creator,
                 difficulty: data.difficulty,
                 leaderboard: data.leaderboard,
+                highscore: username !== "null" ? User.getHighscore(username, data.beatmapID) : 0
             }
         });
     }

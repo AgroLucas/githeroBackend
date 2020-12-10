@@ -5,8 +5,8 @@ let { authorize } = require("../utils/auth");
 
 
 // GET beatmap LIST
-router.get("/", function(req, res, next) {
-    return res.json(Beatmap.getList());
+router.get("/list/:username", function(req, res, next) {
+    return res.json(Beatmap.getList(req.params.username));
 }); 
 
 // GET one beatmap & its song
