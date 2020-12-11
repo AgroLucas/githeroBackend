@@ -80,7 +80,7 @@ router.post("/score", authorize , function (request , response) {               
     highscore = 0;
   if (highscore < request.body.score)
     User.setHighscore(request.body.username, request.body.beatmapId, request.body.score);
-    Beatmap.updateLeaderboard(request.body.beatmapId, highscore, request.body.username);
+    Beatmap.updateLeaderboard(request.body.beatmapId, request.body.score, request.body.username);
   response.json({ oldHighscore: highscore });
   });
 
