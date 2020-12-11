@@ -115,6 +115,13 @@ class Beatmap {
 
     static updateLeaderboard(beatmapID, score, username){
         let leaderboard = this.getLeaderboardFromBeatmapID(beatmapID);
+        
+        //remove old score
+        let oldIndex = findUserInLb(leaderboard, username);
+        if(oldIndex != -1) {
+            leaderboard.splice(oldIndex, 1); //rm
+        }
+
         let i = leaderboard.length-1;
         if(leaderboard.length != 0){ 
             while(i >= 0 && leaderboard[i].score < score){
@@ -140,6 +147,15 @@ class Beatmap {
         lbMap[beatmapID]=leaderboard;
         saveToFile(LEADERBOARD_FILE_PATH, lbMap);
     }
+}
+
+//returns user's index or -1 (not found)
+function findUserInLb(leaderboard, username) {
+    for(let i=0; i<leaderboard.length; i++){
+        let entry = leaderboard[i];
+        if(entry.username === username) return i;
+    }
+    return -1;
 }
 
 function getBMListFromFile(filePath) {
