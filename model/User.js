@@ -51,7 +51,6 @@ class User {
     }
 
     let userFound = User.getUserFromList(username);
-    console.log("User:", userFound, ",  password:", password);
     if (!userFound){
       return Promise.reject('Promise checkCredentials rejected : user not found');
    } 
