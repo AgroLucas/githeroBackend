@@ -106,8 +106,8 @@ class User {
     let user = User.getUserFromList(username);
     let result;
     user.highscores.every( scores => {
-      if (scores.idBeatMap === idBeatMap ) {
-        result = scores.highscore
+      if (scores.idBeatMap == idBeatMap ) {
+        result = scores.highscore;
         return false;
       }
       return true;
