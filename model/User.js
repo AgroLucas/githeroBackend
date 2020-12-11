@@ -139,6 +139,16 @@ class User {
     saveUserListToFile(FILE_PATH, list);
   }
 
+  static getTotalScoreboard() {
+    let list = getUserListFromFile(FILE_PATH);
+    return list.map(user => {
+      return {
+        username: user.username,
+        totalHighscore: user.highscores.reduce((total, score) => total + score.highscore, 0)
+      }
+    }).sort((a,b) => b.totalHighscore - a.totalHighscore); 
+  }
+
 }
 
   function getUserListFromFile(filePath) {
@@ -170,6 +180,7 @@ function saveUserListToFile(filePath, userList) {
   let data = JSON.stringify(userList);
   fs.writeFileSync(filePath, data);
 }
+
 
 
 module.exports = User;

@@ -90,6 +90,10 @@ router.post("/score", authorize , function (request , response) {               
   response.json({ oldHighscore: highscore });
   });
 
+  router.get("/totalscore", function(request, response) {
+    response.json({totalscore: User.getTotalScoreboard() });
+  })
+
 
   module.exports = router;
 
