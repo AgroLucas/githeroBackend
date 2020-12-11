@@ -6,6 +6,7 @@ const JWT = require("jsonwebtoken");
 const {JWTSECRET , JWTLIFETIME , authorize} = require ("../utils/auth.js");
 
 let User = require("../model/User.js");
+let Beatmap = require("../model/Beatmap.js");
 
 //REGISTER
 //POST /api/users/
@@ -87,6 +88,7 @@ router.post("/score", authorize , function (request , response) {               
     highscore = 0;
   if (highscore < request.body.score)
     User.setHighscore(request.body.username, request.body.beatmapId, request.body.score);
+    Beatmap.updateLeaderboard(request.body.beatmapId, highscore, request.body.username);
   response.json({ oldHighscore: highscore });
   });
 
