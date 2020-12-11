@@ -88,6 +88,10 @@ router.post("/score", authorize , function (request , response) {               
     response.json({totalscore: User.getTotalScoreboard() });
   })
 
+  router.get("/testToken", authorize, (req, res)=>{
+    res.json({res: true});
+  });
+
 
   module.exports = router;
 
