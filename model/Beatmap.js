@@ -115,10 +115,13 @@ class Beatmap {
 
     static updateLeaderboard(beatmapID, score, username){
         let leaderboard = this.getLeaderboardFromBeatmapID(beatmapID);
+        console.log("leaderboard: ",leaderboard);
         let i = leaderboard.length;
+        console.log(i);
         if(leaderboard.length != 0){ //empty lb. => 1rst place 
-            while(leaderboard[i].score < score && i >= 0){
+            while(i >= 0 && leaderboard[i].score < score){
                 i--;
+                console.log(i);
             }
             if(i>=LEADERBOARD_SIZE){
                 return; // not in leaderboard
