@@ -2,7 +2,9 @@
 const BCRYPT = require("bcrypt");
 const { getMaxListeners } = require("process");
 const SALTROUNDS = 10;
+const DEFAULT_FILE_PATH = __dirname + "/defaultUsers.json";
 const FILE_PATH = __dirname + "/users.json";
+
 
 
 class User {
@@ -69,11 +71,11 @@ class User {
   }
 
   static get list() {
-    let userList = getUserListFromFile(FILE_PATH);
+    let userList = getUserListFromFile(DEFAULT_FILE_PATH).concat(getUserListFromFile(FILE_PATH)); // user par default + inscrit
     return userList;
   }
   static get adminList() {
-    let adminList = getAdminListFromFile(FILE_PATH);
+    let adminList = getAdminListFromFile(DEFAULT_FILE_PATH).concat(getAdminListFromFile(FILE_PATH));
     return adminList;
   }
 
@@ -87,7 +89,7 @@ class User {
     return userFound !== undefined;
    }
    static getAdminFromList(username) {
-    const adminList = getAdminListFromFile(FILE_PATH);
+    const adminList = getAdminListFromFile(FILE_PATH); // a verifier 
     for (let index = 0; index < adminList.length; index++) {
       if (adminList[index].username === username && username.isAdmin ===true) return adminList[index];
     }
@@ -95,7 +97,7 @@ class User {
   }
   
    static getUserFromList(username) {
-    const userList = getUserListFromFile(FILE_PATH);
+    const userList = getUserListFromFile(FILE_PATH); // a verifier
     for (let index = 0; index < userList.length; index++) {
       if (userList[index].username === username) return userList[index];
     }
