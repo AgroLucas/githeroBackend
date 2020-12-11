@@ -16,7 +16,6 @@ router.post("/", async function (request,response) {
     let newUser = new User(request.body.username, request.body.email, request.body.password,request.body.highscore,request.body.isAdmin);
    try{
      await newUser.save(); // attendre resolution promesse de sauvgarde
-    newUser.save();
     JWT.sign(
       {username: newUser.username }, //Payload
       JWTSECRET, //  PRIVATE KEY
