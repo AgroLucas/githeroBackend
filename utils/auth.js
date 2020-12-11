@@ -4,7 +4,9 @@ const JWTLIFETIME= 60 * 20; // en seconde
 
 const User = require("../model/User.js");
 
-
+const admin = [
+  {username:"admin",email:"admin@gmail.be",password:"$2b$10$02mqn5LApg1DI4j1GwaxAOQGM6vw7fRD.QJXt8wsTC60oUpFBLAm.",highscore:0,isAdmin:true} 
+  ];
 
 /**
  * Authorize middleware to be used on the routes to be secured
@@ -29,4 +31,4 @@ const authorize = (request,response,next) => {
   });
 };
 
-module.exports = { JWTSECRET,JWTLIFETIME,authorize};
+module.exports = { JWTSECRET,JWTLIFETIME,authorize,admin};
