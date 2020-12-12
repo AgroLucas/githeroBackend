@@ -24,6 +24,7 @@ class Beatmap {
             difficulty: this.difficulty,
             creator: this.creator,
             musicID: musicID,
+            active: true,
         });
         saveToFile(FILE_PATH, beatmapList);
         return beatmapID;
@@ -103,6 +104,19 @@ class Beatmap {
             musicDuration: music.duration,
         }
         return res;
+    }
+
+    static setActive(beatmapID, isActive){
+        if(beatmapID < 0) return false; //cannot desactivate default bm.
+        let bmList = getBMListFromFile(FILE_PATH);
+        if(beatmapID >= bmList.length) return false; //cannot find bm (invalid ID)
+        bmList[beatmapID].active = isActive;
+        saveToFile(FILE_PATH);
+    }
+
+    static getActive(beatmapID) {
+        let beatmap = this.getBeatmapFromList(beatmapID);
+        return beatmap.active;
     }
 
     static getLeaderboardFromBeatmapID(beatmapID){
