@@ -72,12 +72,7 @@ class User {
     let userList = getUserListFromFile(DEFAULT_FILE_PATH).concat(getUserListFromFile(FILE_PATH)); // user par default + inscrit
     return userList;
   }
-  static get adminList() {
-    let adminList = getAdminListFromFile(DEFAULT_FILE_PATH).concat(getAdminListFromFile(FILE_PATH));
-    return adminList;
-  }
-
-
+  
   static isUser(username) {
    let userFound = User.getUserFromList(username);
    return userFound !== undefined;
@@ -178,15 +173,6 @@ class User {
   return userList;
 }
 
-function getAdminListFromFile(filePath) {
-  const fs = require("fs");
-  if (!fs.existsSync(filePath)) return [];
-  let adminListRawData = fs.readFileSync(filePath);
-  let adminList;
-  if (adminListRawData) adminList = JSON.parse(adminListRawData);
-  else adminList = [];
-  return adminList;
-}
 
 function saveToFile(filePath, data) {
   console.log("data: ", data);
