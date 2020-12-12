@@ -1,3 +1,7 @@
 /node_modules/
 package-lock.json
 /.vs/
+/model/*.json
+!/model/defaultBeatmaps.json
+!/model/defaultMusics.json
+!/model/defaultUsers.json
