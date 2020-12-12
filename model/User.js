@@ -19,9 +19,7 @@ class User {
       this.highscores = highscores
     this.isAdmin = false
   }
-  //compte admin :
-  //username : admin
-  //password : !Admin123!
+  
   
 
   /* return a promise with async / await */ 
@@ -84,20 +82,9 @@ class User {
    let userFound = User.getUserFromList(username);
    return userFound !== undefined;
   }
-  static isAdmin(username) {
-    let userFound = User.getAdminFromList(username);
-    return userFound !== undefined;
-   }
-   static getAdminFromList(username) {
-    const adminList = getAdminListFromFile(FILE_PATH); // a verifier 
-    for (let index = 0; index < adminList.length; index++) {
-      if (adminList[index].username === username && username.isAdmin ===true) return adminList[index];
-    }
-    return;
-  }
   
    static getUserFromList(username) {
-    const userList = getUserListFromFile(FILE_PATH); // a verifier
+    const userList = getUserListFromFile(DEFAULT_FILE_PATH).concat(getUserListFromFile(FILE_PATH)); // a verifier
     for (let index = 0; index < userList.length; index++) {
       if (userList[index].username === username) return userList[index];
     }
