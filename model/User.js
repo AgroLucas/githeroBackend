@@ -98,7 +98,7 @@ class User {
       return true;
     });
     return result;*/
-    let highscoreList = getHighscoreMap(HIGHSCORE_FILE_PATH);
+    let highscoreList = getHighscoreList(HIGHSCORE_FILE_PATH);
     let userIndex = searchUserHSIndex(username, highscoreList);
     if(userIndex === -1) {
       console.log("no highscore from user, return 0");
@@ -118,7 +118,7 @@ class User {
 
   //returns boolean
   static setHighscore(username, idBeatMap, highscore) {
-    let highscoreList = getHighscoreMap(HIGHSCORE_FILE_PATH);
+    let highscoreList = getHighscoreList(HIGHSCORE_FILE_PATH);
 
     let userIndex = searchUserHSIndex(username, highscoreList);
 
@@ -152,11 +152,11 @@ class User {
   }
 
   static getTotalScoreboard() {
-    let list = getUserListFromFile(FILE_PATH);
-    return list.map(user => {
+    let list = getHighscoreList(HIGHSCORE_FILE_PATH);
+    return list.map(userEntry => {
       return {
-        username: user.username,
-        totalHighscore: user.highscores.reduce((total, score) => total + score.highscore, 0)
+        username: userEntry.username,
+        totalHighscore: userEntry.allHighscores.reduce((total, score) => total + score.highscore, 0)
       }
     }).sort((a,b) => b.totalHighscore - a.totalHighscore); 
   }
@@ -182,7 +182,7 @@ function saveToFile(filePath, data) {
   fs.writeFileSync(filePath, jsonData);
 }
 
-function getHighscoreMap(filePath) {
+function getHighscoreList(filePath) {
   const fs = require("fs");
   if(!fs.existsSync(filePath)) return [];
   let highscoreMapRawData = fs.readFileSync(filePath);
