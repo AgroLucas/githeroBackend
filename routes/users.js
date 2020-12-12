@@ -74,14 +74,12 @@ router.post("/", async function (request,response) {
   };
  });
 
-router.post("/score", authorize , function (request , response) {                 //TODO authorize doesn't work
-  let highscore = User.getHighscore(request.body.username, request.body.beatmapId);
-  if (!highscore) 
-    highscore = 0;
-  if (highscore < request.body.score)
-    User.setHighscore(request.body.username, request.body.beatmapId, request.body.score);
+router.post("/score", authorize , function (request , response) {
+  let oldHighscore = User.getHighscore(request.body.username, request.body.beatmapId);
+  if(User.setHighscore(request.body.username, request.body.beatmapId, request.body.score)){
     Beatmap.updateLeaderboard(request.body.beatmapId, request.body.score, request.body.username);
-  response.json({ oldHighscore: highscore });
+  }
+  response.json({ oldHighscore: oldHighscore });
   });
 
   router.get("/totalscore", function(request, response) {

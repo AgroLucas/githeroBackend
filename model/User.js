@@ -4,6 +4,7 @@ const { getMaxListeners } = require("process");
 const SALTROUNDS = 10;
 const DEFAULT_FILE_PATH = __dirname + "/defaultUsers.json";
 const FILE_PATH = __dirname + "/users.json";
+const HIGHSCORE_FILE_PATH = __dirname + "/highscores.json";
 
 
 
@@ -32,7 +33,7 @@ class User {
       let hashedPassword = await BCRYPT.hash(this.password, SALTROUNDS); //async attendre return de hash
       console.log('Promise BCRYPT.hash fulfilled, hashedPassword :', hashedPassword);
       userList.push({username: this.username, email: this.email, password: hashedPassword, highscores: this.highscores, isAdmin: false});
-      saveUserListToFile(FILE_PATH,userList);
+      saveToFile(FILE_PATH,userList);
       console.log('Promise save fulfilled');
       return Promise.resolve(true);
     }catch(error){
@@ -51,7 +52,6 @@ class User {
     }
 
     let userFound = User.getUserFromList(username);
-    console.log("User:", userFound, ",  password:", password);
     if (!userFound){
       return Promise.reject('Promise checkCredentials rejected : user not found');
    } 
@@ -104,8 +104,9 @@ class User {
     return;
   }
   
+  //don't use to check before setHighscore (check already built in setHighscore)
   static getHighscore(username, idBeatMap) { 
-    let user = User.getUserFromList(username);
+    /*let user = User.getUserFromList(username);
     let result;
     user.highscores.every( scores => {
       if (scores.idBeatMap == idBeatMap ) {
@@ -114,31 +115,58 @@ class User {
       }
       return true;
     });
-    return result;
+    return result;*/
+    let highscoreList = getHighscoreMap(HIGHSCORE_FILE_PATH);
+    let userIndex = searchUserHSIndex(username, highscoreList);
+    if(userIndex === -1) {
+      console.log("no highscore from user, return 0");
+      return 0; //no highscore from user
+    }
+
+    let userHighscores = highscoreList[userIndex].allHighscores;
+    let bmIndex = searchBMHighscoreIndex(idBeatMap, userHighscores);
+    if(bmIndex === -1) {
+      console.log("no highscore on this beatmap from user, return 0");
+      return 0; // no highscore from user on idBeatMap
+    }
+
+    console.log("highscore found");
+    return userHighscores[bmIndex].highscore; // highscore found
   }
-  
+
+  //returns boolean
   static setHighscore(username, idBeatMap, highscore) {
-    let list = getUserListFromFile(FILE_PATH);
-    list.forEach(element => {
-      if (element.username === username) {
-        let flag;
-        element.highscores.every(scores => {
-          if (scores.idBeatMap === idBeatMap) {
-            flag = "false";
-            scores.highscore = highscore;
-            return false;
-          }
-          return true;
-        });
-        if (typeof(flag) === "undefined") {
-          let score = {};
-          score.idBeatMap = idBeatMap;
-          score.highscore = highscore;
-          element.highscores.push(score);
-        }
+    let highscoreList = getHighscoreMap(HIGHSCORE_FILE_PATH);
+
+    let userIndex = searchUserHSIndex(username, highscoreList);
+
+    if(userIndex === -1) { //user not previously in highscoreList
+      let entry = {
+        username: username,
+        allHighscores: [],
       }
-    });
-    saveUserListToFile(FILE_PATH, list);
+      userIndex = highscoreList.push(entry) -1;
+    }
+
+    let bmIndex = searchBMHighscoreIndex(idBeatMap, highscoreList[userIndex].allHighscores);
+  
+    if(bmIndex === -1){ //no previous entry
+      let entry = {
+        idBeatMap: idBeatMap,
+        highscore: highscore,
+      };
+      highscoreList[userIndex].allHighscores.push(entry);
+      saveToFile(HIGHSCORE_FILE_PATH, highscoreList);
+      console.log("new entry: ", highscoreList);
+      return true;
+    }
+
+    //previous entry found
+    if(highscoreList[userIndex].allHighscores[bmIndex].highscore >= highscore) return false; //old entry has greater h.s. than current one
+    highscoreList[userIndex].allHighscores[bmIndex].highscore = highscore;
+    saveToFile(HIGHSCORE_FILE_PATH, highscoreList);
+    console.log("modified old entry: ",highscoreList);
+    return true;
   }
 
   static getTotalScoreboard() {
@@ -162,6 +190,7 @@ class User {
   else userList = [];
   return userList;
 }
+
 function getAdminListFromFile(filePath) {
   const fs = require("fs");
   if (!fs.existsSync(filePath)) return [];
@@ -171,18 +200,44 @@ function getAdminListFromFile(filePath) {
   else adminList = [];
   return adminList;
 }
-function saveAdminListToFile(filePath, adminList) {
+
+function saveToFile(filePath, data) {
+  console.log("data: ", data);
   const fs = require("fs");
-  let data = JSON.stringify(adminList);
-  fs.writeFileSync(filePath, data);
+  let jsonData = JSON.stringify(data);
+  console.log("jsonData: ", jsonData);
+  fs.writeFileSync(filePath, jsonData);
 }
 
-function saveUserListToFile(filePath, userList) {
+function getHighscoreMap(filePath) {
   const fs = require("fs");
-  let data = JSON.stringify(userList);
-  fs.writeFileSync(filePath, data);
+  if(!fs.existsSync(filePath)) return [];
+  let highscoreMapRawData = fs.readFileSync(filePath);
+  let highscoreMap;
+  if(highscoreMapRawData) highscoreMap = JSON.parse(highscoreMapRawData);
+  else highscoreMap = [];
+  return highscoreMap;
 }
 
+//searches through one user's h.s. list returns the index of the beatmap's entry (or -1)
+function searchBMHighscoreIndex(beatmapID, userHighscoreList) {
+  for(let i=0; i<userHighscoreList.length; i++){
+    let entry = userHighscoreList[i];
+    if(entry.idBeatMap == beatmapID){
+      return i;
+    }
+  }
+  return -1;
+}
 
+function searchUserHSIndex(username, highscoreList) {
+  for(let i=0; i<highscoreList.length; i++){
+    let entry = highscoreList[i];
+    if(entry.username === username){
+      return i;
+    }
+  }
+  return -1;
+}
 
 module.exports = User;
