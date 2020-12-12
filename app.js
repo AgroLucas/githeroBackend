@@ -11,7 +11,7 @@ let app = express();
 
 //app.use(helmet());
 app.use(logger("dev"));
-app.use(express.json({limit: "15mb"}));
+app.use(express.json({limit: "10mb"}));
 app.use(express.urlencoded({ 
   limit: "15mb",
   extended: false
