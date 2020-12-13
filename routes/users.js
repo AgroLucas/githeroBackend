@@ -26,7 +26,7 @@ router.post("/", async function (request,response) {
           console.error("JWT.sign error:", error);
           response.status(500).end(); // Server error
         }else{
-          console.log("JWT.sign OK:", token);
+          console.log("JWT.sign OK");
           response.json({ username: newUser.username, token });
           // username returned to the client to manage his display and token sent to the client, he has to save for
           // use future requests requiring authorization
@@ -57,7 +57,7 @@ router.post("/", async function (request,response) {
           console.error("JWT.sign error:", error);
           response.status(500).end(); // Server error
         }else{
-          console.log("JWT.sign OK, token:", token);
+          console.log("JWT.sign OK");
           response.json({ username: user.username, token });
           //username returned to the client to manage his display and token sent to the client, he has to save for
           //use future requests requiring authorization
