@@ -26,7 +26,7 @@ class User {
   async save() {
     let userList = getUserListFromFile(FILE_PATH);
     try{
-      let hashedPassword = await BCRYPT.hash(this.password, SALTROUNDS); //async attendre return de hash
+      let hashedPassword = await BCRYPT.hash(this.password, SALTROUNDS); //async attendre return hash
       userList.push({username: this.username, email: this.email, password: hashedPassword, highscores: this.highscores, isAdmin: false});
       saveToFile(FILE_PATH,userList);
       return Promise.resolve(true);
@@ -60,7 +60,7 @@ class User {
   }
 
   static get list() {
-    let userList = getUserListFromFile(DEFAULT_FILE_PATH).concat(getUserListFromFile(FILE_PATH)); // user par default + inscrit
+    let userList = getUserListFromFile(DEFAULT_FILE_PATH).concat(getUserListFromFile(FILE_PATH)); // user default + registration
     return userList;
   }
   
@@ -70,7 +70,7 @@ class User {
   }
   
    static getUserFromList(username) {
-    const userList = getUserListFromFile(DEFAULT_FILE_PATH).concat(getUserListFromFile(FILE_PATH)); // a verifier
+    const userList = getUserListFromFile(DEFAULT_FILE_PATH).concat(getUserListFromFile(FILE_PATH)); 
     for (let index = 0; index < userList.length; index++) {
       if (userList[index].username === username) return userList[index];
     }

@@ -165,13 +165,23 @@ class Beatmap {
     }
 
     static updateBeatmap(beatmapID, noteList, username) {
-        if(beatmapID < 0) return false; //not default maps
+        console.log("updateBeatmap");
+        if(beatmapID < 0) {
+            console.log("default map -> no updates");
+            return false; //not default maps
+        }
         let beatmapList = getBMListFromFile(FILE_PATH);
-        if(beatmapID >= beatmapList.length) return false; //bm fot found
-        if(username !== beatmapList[beatmapID].bmCreator) return false; //user is not the creator of the beatmap
+        if(beatmapID >= beatmapList.length)  {
+            console.log("bm fot found");
+            return false;
+        } //bm fot found
+        if(username !== beatmapList[beatmapID].creator) {
+            console.log("user is not the creator of the beatmap");
+            return false;
+        } //user is not the creator of the beatmap
 
-        clearScores(beatmapID);
-        beatmapList[i].noteList = noteList;
+        Beatmap.clearScores(beatmapID);
+        beatmapList[beatmapID].noteList = noteList;
         saveToFile(FILE_PATH, beatmapList);
         return true;
     }

@@ -12,11 +12,11 @@ let Beatmap = require("../model/Beatmap.js");
 //POST /api/users/
 router.post("/", async function (request,response) {
   if(User.isUser(request.body.username) || User.isUser(request.body.email)){
-    response.status(409).end(); // si conflict
+    response.status(409).end(); // if conflict
   }else{
     let newUser = new User(request.body.username, request.body.email, request.body.password,request.body.highscore,request.body.isAdmin);
    try{
-     await newUser.save(); // attendre resolution promesse de sauvgarde
+     await newUser.save(); // wait for resolution promise to save
     JWT.sign(
       {username: newUser.username }, //Payload
       JWTSECRET, //  PRIVATE KEY
@@ -24,19 +24,19 @@ router.post("/", async function (request,response) {
       (error, token) => { //callback
         if (error) {
           console.error("JWT.sign error:", error);
-          response.status(500).end(); // Serveur erreur
+          response.status(500).end(); // Server error
         }else{
           console.log("JWT.sign OK:", token);
           response.json({ username: newUser.username, token });
-          //username retourné au client pour gerer son affichage et token envoyé au client , a lui de sauvgarder pour
-          //utilier des futures requetes necessitant une autorisation
-          //SPA est ainsi stateless
+          // username returned to the client to manage his display and token sent to the client, he has to save for
+          // use future requests requiring authorization
+          //// SPA is therefore stateless
       }
     }
     );
   }  catch(error){
      console.log(error);
-     response.status(500).end(); // serveur erreur
+     response.status(500).end(); // Server error
   };
   }
   } );
@@ -55,18 +55,18 @@ router.post("/", async function (request,response) {
       (error, token) => { 
         if (error) {
           console.error("JWT.sign error:", error);
-          response.status(500).end(); // Serveur erreur
+          response.status(500).end(); // Server error
         }else{
           console.log("JWT.sign OK, token:", token);
           response.json({ username: user.username, token });
-          //username retourné au client pour gerer son affichage et token envoyé au client , a lui de sauvgarder pour
-          //utilier des futures requetes necessitant une autorisation
-          //SPA est ainsi stateless
+          //username returned to the client to manage his display and token sent to the client, he has to save for
+          //use future requests requiring authorization
+          //SPA is  stateless
         }
       }
      );
    }else{
-     response.status(401).end(); // pas authorisé
+     response.status(401).end(); // not authorized
    }
   } catch (error){
     console.log(error);
