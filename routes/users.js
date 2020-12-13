@@ -86,8 +86,8 @@ router.post("/score", authorize , function (request , response) {
     response.json({totalscore: User.getTotalScoreboard() });
   })
 
-  router.get("/testToken", authorize, (req, res)=>{
-    res.json({res: true});
+  router.post("/isAdmin", authorize, (request, res)=>{
+    res.json({isAdmin: User.isAdmin(request.body.username)});
   });
 
 

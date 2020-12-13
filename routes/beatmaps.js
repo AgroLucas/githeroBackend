@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 var Beatmap = require("../model/Beatmap.js");
+const User = require("../model/User.js");
 let { authorize } = require("../utils/auth");
 
 
@@ -26,6 +27,14 @@ router.post("/", authorize, function(req, res, next){
         req.body.musicData, req.body.musicArtist, req.body.musicDuration, req.body.bmCreator);
     let beatmapID = beatmap.save();
     return res.json({beatmapID: beatmapID});
+});
+
+
+router.patch("/setActive/:flag/:beatmapID", authorize, function(req, res){
+    let flag = req.params.flag == "true" ? true : false; //convert string in bool
+    if (User.isAdmin(req.body.username)) 
+        Beatmap.setActive(req.params.beatmapID, flag);
+    return res.json();
 });
 
 module.exports = router;

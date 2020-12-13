@@ -24,18 +24,13 @@ class User {
 
   /* return a promise with async / await */ 
   async save() {
-    console.log('Promise save pending');
     let userList = getUserListFromFile(FILE_PATH);
     try{
-      console.log('Promise BCRYPT.hash pending');
       let hashedPassword = await BCRYPT.hash(this.password, SALTROUNDS); //async attendre return de hash
-      console.log('Promise BCRYPT.hash fulfilled, hashedPassword :', hashedPassword);
       userList.push({username: this.username, email: this.email, password: hashedPassword, highscores: this.highscores, isAdmin: false});
       saveToFile(FILE_PATH,userList);
-      console.log('Promise save fulfilled');
       return Promise.resolve(true);
     }catch(error){
-      console.log('Promise save rejected :', error);
       return Promise.reject('Promise save rejected : error in BCRYPT.hash or saveUserListToFile');
     };
 
@@ -44,7 +39,6 @@ class User {
 
   /* return a promise with classic promise syntax*/
   async checkCredentials(username, password) {
-   console.log('Promise checkCredentials pending');
     if (!username || !password) {
       return Promise.reject('Promise checkCredentials rejected : no email or no password');
     }
@@ -54,16 +48,13 @@ class User {
       return Promise.reject('Promise checkCredentials rejected : user not found');
    } 
    try{
-     console.log('Promise BCRYPT.compare pending');
      let match = await BCRYPT.compare(password,userFound.password); //async
-     console.log('Promise BCRYPT.compare fulfilled, match :', match);
      if (match){
        return Promise.resolve(true);
      }else{
        return Promise.resolve(false);
      }
     }catch (error) {
-      console.log('Promise BCRYPT.compare rejected :', error);
       return Promise.reject('Promise checkCredentials rejected : error in BCRYPT.compare');
     };
   }
@@ -101,18 +92,15 @@ class User {
     let highscoreList = getHighscoreList(HIGHSCORE_FILE_PATH);
     let userIndex = searchUserHSIndex(username, highscoreList);
     if(userIndex === -1) {
-      console.log("no highscore from user, return 0");
       return 0; //no highscore from user
     }
 
     let userHighscores = highscoreList[userIndex].allHighscores;
     let bmIndex = searchBMHighscoreIndex(idBeatMap, userHighscores);
     if(bmIndex === -1) {
-      console.log("no highscore on this beatmap from user, return 0");
       return 0; // no highscore from user on idBeatMap
     }
 
-    console.log("highscore found");
     return userHighscores[bmIndex].highscore; // highscore found
   }
 
@@ -139,7 +127,6 @@ class User {
       };
       highscoreList[userIndex].allHighscores.push(entry);
       saveToFile(HIGHSCORE_FILE_PATH, highscoreList);
-      console.log("new entry: ", highscoreList);
       return true;
     }
 
@@ -147,7 +134,6 @@ class User {
     if(highscoreList[userIndex].allHighscores[bmIndex].highscore >= highscore) return false; //old entry has greater h.s. than current one
     highscoreList[userIndex].allHighscores[bmIndex].highscore = highscore;
     saveToFile(HIGHSCORE_FILE_PATH, highscoreList);
-    console.log("modified old entry: ",highscoreList);
     return true;
   }
 
@@ -159,6 +145,13 @@ class User {
         totalHighscore: userEntry.allHighscores.reduce((total, score) => total + score.highscore, 0)
       }
     }).sort((a,b) => b.totalHighscore - a.totalHighscore); 
+  }
+
+  static isAdmin(username) {
+    let user = User.getUserFromList(username);
+    if (user && user.isAdmin)
+      return true;
+    return false;
   }
 
 }
@@ -175,10 +168,8 @@ class User {
 
 
 function saveToFile(filePath, data) {
-  console.log("data: ", data);
   const fs = require("fs");
   let jsonData = JSON.stringify(data);
-  console.log("jsonData: ", jsonData);
   fs.writeFileSync(filePath, jsonData);
 }
 

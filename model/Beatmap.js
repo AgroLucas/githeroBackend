@@ -12,6 +12,7 @@ class Beatmap {
         this.creator = bmCreator;
         this.difficulty = difficulty; // String
         this.musicObj = new Music(musicTitle, songArtist,  musicData, musicDuration);
+        this.active = true;
     }
 
     save() {
@@ -24,7 +25,7 @@ class Beatmap {
             difficulty: this.difficulty,
             creator: this.creator,
             musicID: musicID,
-            active: true,
+            active: this.active,
         });
         saveToFile(FILE_PATH, beatmapList);
         return beatmapID;
@@ -38,7 +39,6 @@ class Beatmap {
             let highscore = 0;
             if(username !== "null")
                 highscore = User.getHighscore(username, data.beatmapID);
-        
             return {
                 beatmapID: data.beatmapID,
                 musicTitle: data.musicTitle,
@@ -47,7 +47,8 @@ class Beatmap {
                 creator: data.creator,
                 difficulty: data.difficulty,
                 leaderboard: data.leaderboard,
-                highscore: highscore ? highscore : 0
+                highscore: highscore ? highscore : 0,
+                isActive: data.isActive
             }
         });
     }
@@ -102,6 +103,7 @@ class Beatmap {
             musicArtist: music.artist,
             musicData: music.data,
             musicDuration: music.duration,
+            isActive: bm.active
         }
         return res;
     }
@@ -111,7 +113,7 @@ class Beatmap {
         let bmList = getBMListFromFile(FILE_PATH);
         if(beatmapID >= bmList.length) return false; //cannot find bm (invalid ID)
         bmList[beatmapID].active = isActive;
-        saveToFile(FILE_PATH);
+        saveToFile(FILE_PATH, bmList);
     }
 
     static getActive(beatmapID) {
@@ -161,6 +163,11 @@ class Beatmap {
         lbMap[beatmapID]=leaderboard;
         saveToFile(LEADERBOARD_FILE_PATH, lbMap);
     }
+
+    static disable(beatmapID) {
+
+    }
+
 }
 
 //returns user's index or -1 (not found)
