@@ -18,8 +18,8 @@ app.use(express.urlencoded({
 }));
 app.use(cookieParser());
 
-app.use(express.static(path.join(__dirname, "public"))); //envoye static files to client
-app.use((req,res,next)=>{ //  su uri est pas trouve alors renvoie un fichier static puis index.html essetienl
+app.use(express.static(path.join(__dirname, "public"))); //send static files to client
+app.use((req,res,next)=>{ //  if uri is not found then return a static file then  index.html
   if(!req.path.startsWith("/api/"))
   return res.sendFile(`${__dirname}/public/index.html`);
   next();
