@@ -1,7 +1,7 @@
 # Projet_JS_Backend
 
 1) Clone the repo
-git clone https://github.com/baptistehonnay/Projet_JS_Backend
+git clone https://github.com/baptistehonnay/Projet_JS_Backend.git
 
 2) Install dependencies
 npm install
