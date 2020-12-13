@@ -6,12 +6,12 @@ let { authorize } = require("../utils/auth");
 
 
 // GET beatmap LIST
-router.get("/list/:username", function(req, res, next) {
+router.get("/list/:username", function(req, res) {
     return res.json(Beatmap.getList(req.params.username));
 }); 
 
 // GET one beatmap & its song
-router.get("/:beatmapID", function(req, res, next) {
+router.get("/:beatmapID", function(req, res) {
     let beatmapID = req.params.beatmapID;
     if(Beatmap.isBeatmap(beatmapID)){
         return res.json(Beatmap.getBeatmapFromList(beatmapID));
