@@ -183,7 +183,6 @@ class Beatmap {
         Beatmap.clearScores(beatmapID);
         beatmapList[beatmapID].noteList = noteList;
         saveToFile(FILE_PATH, beatmapList);
-        console.log("ok");
         return true;
     }
 
