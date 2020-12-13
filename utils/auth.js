@@ -1,6 +1,6 @@
 const JWT = require("jsonwebtoken");
 const JWTSECRET = "mySUPERsecrectJWTprivatekey!";
-const JWTLIFETIME= 60 * 20; // en seconde 
+const JWTLIFETIME= 60 * 20; // in second
 
 const User = require("../model/User.js");
 
@@ -16,14 +16,14 @@ const authorize = (request,response,next) => {
    JWT.verify(token, JWTSECRET, (error, token) => {
     if (error) {
       console.error("JWT.verify error:" + error.message);
-      response.status(401); // pas authorisé
+      response.status(401); // not authorized
     }else{
       let user = User.getUserFromList(token.username);
       if(!user){
         console.log("JWT.verify error: user in the JWT Token not found .");
-      response.status(401); // pas authorisé
+      response.status(401); // not authorized
       }else{
-        next(); // appel le prochain middleware
+        next(); // call the next middleware
       }
     }
   });
