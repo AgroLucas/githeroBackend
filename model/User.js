@@ -4,7 +4,7 @@ const SALTROUNDS = 10;
 const DEFAULT_FILE_PATH = __dirname + "/defaultUsers.json";
 const FILE_PATH = __dirname + "/users.json";
 const HIGHSCORE_FILE_PATH = __dirname + "/highscores.json";
-var Util = require("../utils/Util.js");
+var Util = require("../utils/util.js");
 
 
 
