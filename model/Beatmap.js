@@ -12,7 +12,7 @@ class Beatmap {
         this.creator = bmCreator;
         this.difficulty = difficulty; // String
         this.musicObj = new Music(musicTitle, songArtist,  musicData, musicDuration);
-        this.active = true;
+        this.isActive = true;
     }
 
     save() {
@@ -25,7 +25,7 @@ class Beatmap {
             difficulty: this.difficulty,
             creator: this.creator,
             musicID: musicID,
-            active: this.active,
+            isActive: this.isActive,
         });
         saveToFile(FILE_PATH, beatmapList);
         return beatmapID;
@@ -103,7 +103,7 @@ class Beatmap {
             musicArtist: music.artist,
             musicData: music.data,
             musicDuration: music.duration,
-            isActive: bm.active
+            isActive: bm.isActive
         }
         return res;
     }
@@ -112,13 +112,13 @@ class Beatmap {
         if(beatmapID < 0) return false; //cannot desactivate default bm.
         let bmList = getBMListFromFile(FILE_PATH);
         if(beatmapID >= bmList.length) return false; //cannot find bm (invalid ID)
-        bmList[beatmapID].active = isActive;
+        bmList[beatmapID].isActive = isActive;
         saveToFile(FILE_PATH, bmList);
     }
 
     static getActive(beatmapID) {
         let beatmap = this.getBeatmapFromList(beatmapID);
-        return beatmap.active;
+        return beatmap.isActive;
     }
 
     static getLeaderboardFromBeatmapID(beatmapID){

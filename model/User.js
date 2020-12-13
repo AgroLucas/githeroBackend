@@ -1,10 +1,10 @@
 "use strict";
 const BCRYPT = require("bcrypt");
-const { getMaxListeners } = require("process");
 const SALTROUNDS = 10;
 const DEFAULT_FILE_PATH = __dirname + "/defaultUsers.json";
 const FILE_PATH = __dirname + "/users.json";
 const HIGHSCORE_FILE_PATH = __dirname + "/highscores.json";
+var Util = require("../utils/Util.js");
 
 
 
@@ -79,16 +79,6 @@ class User {
   
   //don't use to check before setHighscore (check already built in setHighscore)
   static getHighscore(username, idBeatMap) { 
-    /*let user = User.getUserFromList(username);
-    let result;
-    user.highscores.every( scores => {
-      if (scores.idBeatMap == idBeatMap ) {
-        result = scores.highscore;
-        return false;
-      }
-      return true;
-    });
-    return result;*/
     let highscoreList = getHighscoreList(HIGHSCORE_FILE_PATH);
     let userIndex = searchUserHSIndex(username, highscoreList);
     if(userIndex === -1) {
@@ -198,8 +188,14 @@ function getHighscoreList(filePath) {
   if(!fs.existsSync(filePath)) return [];
   let highscoreMapRawData = fs.readFileSync(filePath);
   let highscoreMap;
-  if(highscoreMapRawData) highscoreMap = JSON.parse(highscoreMapRawData);
-  else highscoreMap = [];
+
+  if(highscoreMapRawData) {
+    highscoreMap = JSON.parse(highscoreMapRawData);   
+    for (let i = 0; i < highscoreMap.length; i++)
+      highscoreMap[i].allHighscores = highscoreMap[i].allHighscores.filter(isNotBlocked);
+  }
+  else 
+    highscoreMap = [];
   return highscoreMap;
 }
 
@@ -223,5 +219,12 @@ function searchUserHSIndex(username, highscoreList) {
   }
   return -1;
 }
+
+function isNotBlocked(highscore) {
+    if (highscore.idBeatMap >= 0 && !Util.getActive(highscore.idBeatMap))
+      return false;
+    return true;
+}
+
 
 module.exports = User;

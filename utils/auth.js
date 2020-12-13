@@ -1,6 +1,6 @@
 const JWT = require("jsonwebtoken");
-const JWTSECRET = "mySUPERsecrectJWTprivatekey!";
-const JWTLIFETIME= 60 * 20; // en seconde 
+const JWTSECRET = "7iP4CTsFt4sQHyz3DE3fyPjEKdag";
+const JWTLIFETIME= 60 * 60 * 20; // en seconde 
 
 const User = require("../model/User.js");
 
