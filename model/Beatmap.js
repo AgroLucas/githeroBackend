@@ -161,6 +161,24 @@ class Beatmap {
         lbMap[beatmapID]=leaderboard;
         saveToFile(LEADERBOARD_FILE_PATH, lbMap);
     }
+
+    static updateBeatmap(beatmapID, noteList, username) {
+        if(beatmapID < 0) return false; //not default maps
+        let beatmapList = getBMListFromFile(FILE_PATH);
+        if(beatmapID >= beatmapList.length) return false; //bm fot found
+        if(username !== beatmapList[beatmapID].bmCreator) return false; //user is not the creator of the beatmap
+
+        clearScores(beatmapID);
+        beatmapList[i].noteList = noteList;
+        saveToFile(FILE_PATH, beatmapList);
+        return true;
+    }
+
+    static clearScores(beatmapID){
+        let leaderboardMap = getLBMapFromFile(LEADERBOARD_FILE_PATH);
+        leaderboardMap[beatmapID] = [];
+        User.clearHighscoresFrom(beatmapID);
+    }
 }
 
 //returns user's index or -1 (not found)

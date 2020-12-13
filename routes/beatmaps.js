@@ -21,11 +21,17 @@ router.get("/:beatmapID", function(req, res, next) {
 });
 
 //POST a new beatmap -> return beatmapID
-router.post("/", authorize, function(req, res, next){
+router.post("/", authorize, function(req, res){
     let beatmap = new Beatmap(req.body.noteList, req.body.difficulty, req.body.musicTitle, 
         req.body.musicData, req.body.musicArtist, req.body.musicDuration, req.body.bmCreator);
     let beatmapID = beatmap.save();
     return res.json({beatmapID: beatmapID});
+});
+
+// UPDATE existing beatmap
+router.put("/", authorize, function(req, res){
+    let result = Beatmap.updateBeatmap(req.body.beatmapID, req.body.noteList, req.body.username);
+    res.json({res: result});
 });
 
 module.exports = router;
