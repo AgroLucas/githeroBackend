@@ -153,6 +153,26 @@ class User {
       return true;
     return false;
   }
+  
+  //clears all highscores from a certain beatmap
+  static clearHighscoresFrom(beatmapID) {
+    let highscoreList = getHighscoreList(HIGHSCORE_FILE_PATH);
+
+    for(let userIndex = 0; userIndex<highscoreList.length; userIndex++){
+      let removal = false;
+      let highscoreUserList = highscoreList[userIndex].allHighscores;
+      let entryIndex = 0;
+      while(entryIndex <highscoreUserList.length && !removal){
+        if(highscoreUserList[entryIndex].idBeatMap == beatmapID){
+          highscoreList[userIndex].allHighscores.splice(entryIndex, 1);
+          removal = true;
+        }
+        entryIndex++;
+      }
+    }
+
+    saveToFile(HIGHSCORE_FILE_PATH, highscoreList);
+  }
 
 }
 
