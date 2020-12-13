@@ -29,7 +29,7 @@ router.post("/", authorize, function(req, res){
 });
 
 // UPDATE existing beatmap
-router.put("/", authorize, function(req, res){
+router.patch("/", authorize, function(req, res){
     let result = Beatmap.updateBeatmap(req.body.beatmapID, req.body.noteList, req.body.username);
     res.json({res: result});
 });
