@@ -37,8 +37,9 @@ router.patch("/setActive/:flag/:beatmapID", authorize, function(req, res){
     return res.json();
 });
 
-// UPDATE existing beatmap
+// UPDATE existing beatmap noteList
 router.patch("/", authorize, function(req, res){
+    console.log("ROUTER noteList: ", req.body.noteList, " id: ", req.body.beatmapID, " username: ", req.body.username);
     let result = Beatmap.updateBeatmap(req.body.beatmapID, req.body.noteList, req.body.username);
     res.json({res: result});
 });
